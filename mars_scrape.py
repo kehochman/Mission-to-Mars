@@ -69,30 +69,7 @@ def featured_image(browser):
         img_url = f'https://www.jpl.nasa.gov{img_url_rel}'
     
     return img_url
-
-
-#Mars Weather
-def twitter_weather(browser):
-
-    url = 'https://twitter.com/marswxreport?lang=en'
-    browser.visit(url)
-
-    time.sleep(5)
-
-    html = browser.html
-    weather_soup = bs(html, 'html.parser')
-
-    mars_weather_tweet = weather_soup.find('div', attrs={'class':'tweet','data-name':'Mars Weather'})
-
-    try:
-        mars_weather = mars_weather_tweet.find('p','tweet-text').get_text()
-        mars_weather
-        
-    except AttributeError:
-        pattern = re.compile(r'sol')
-        mars_weather = weather_soup.find('span', text=pattern).text
-        mars_weather
-    
+       
 #Mars Hemispheres
 def hemispheres(browser):
 
@@ -115,11 +92,40 @@ def hemispheres(browser):
 
     return hemisphere_image_urls
 
+#Mars Weather
+def twitter_weather(browser):
+
+    url = 'https://twitter.com/marswxreport?lang=en'
+    browser.visit(url)
+
+    time.sleep(5)
+
+    html = browser.html
+    weather_soup = bs(html, 'html.parser')
+
+    mars_weather_tweet = weather_soup.find('div', attrs={'class':'tweet','data-name':'Mars Weather'})
+
+    try:
+        mars_weather = mars_weather_tweet.find('p','tweet-text').get_text()
+        
+    except AttributeError:
+        pattern = re.compile(r'sol')
+        mars_weather = weather_soup.find('span', text=pattern).text
+
+    return mars_weather
+
 #Mars Facts
 
-df = pd.read_html('https://space-facts.com/mars/')[0]
+def mars_facts():
+    try:
+        df = pd.read_html('https://space-facts.com/mars/')[0]
+    
+    except BaseException:
+        return None
 
-df.columns=['description','value']
+    df.columns=['description','value']
+    
+    return df.to_html(classes='table table-striped')
 
-df.to_html('Mars_Facts.png')
-
+if __name__ == '__main__':
+        print(scrape_all())
